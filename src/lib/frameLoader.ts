@@ -8,6 +8,9 @@ import { frameFileName, FRAME_COUNT } from '../data/film'
 import { strideLoadOrder } from './scrollFilm'
 
 export const CONCURRENCY = 6
+/** Fewer parallel decodes on phones — image decoding competes with the
+ *  canvas draws on the same cores, and 6 at a time stutters scrolling. */
+export const CONCURRENCY_TOUCH = 4
 
 export interface LoaderStats {
   loaded: number
@@ -24,6 +27,7 @@ export class FrameLoader {
   private failedSet = new Set<number>()
   private queue: number[] = []
   private active = 0
+  private concurrency: number
   private startedAt = 0
   private firstFrameMs: number | null = null
   private fullLoadMs: number | null = null
@@ -39,9 +43,10 @@ export class FrameLoader {
     this.queue = []
   }
 
-  constructor(baseUrl: string, frameCount: number = FRAME_COUNT) {
+  constructor(baseUrl: string, frameCount: number = FRAME_COUNT, concurrency: number = CONCURRENCY) {
     this.baseUrl = baseUrl
     this.frameCount = frameCount
+    this.concurrency = concurrency
   }
 
   get stats(): LoaderStats {
@@ -114,7 +119,7 @@ export class FrameLoader {
   }
 
   private pump(): void {
-    while (this.active < CONCURRENCY && this.queue.length > 0) {
+    while (this.active < this.concurrency && this.queue.length > 0) {
       const frame = this.queue.shift()
       if (frame === undefined) break
       if (this.images.has(frame) || this.loading.has(frame) || this.failedSet.has(frame)) {

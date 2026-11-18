@@ -10,11 +10,13 @@ interface Props {
 }
 
 const LETTER_VARIANTS = {
-  hidden: { opacity: 0, y: 16, filter: 'blur(6px)' },
+  // No blur here: animating filter: blur() on text is the single most
+  // expensive thing on a phone — it made the whole site stutter while
+  // scrolling (fixed 18 Nov). Opacity + rise is just as elegant.
+  hidden: { opacity: 0, y: 16 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    filter: 'blur(0px)',
     transition: { delay: i * 0.04, duration: 0.55, ease: 'easeOut' },
   }),
 }
@@ -59,7 +61,9 @@ export default function SceneText({ content, visibility, localProgress }: Props)
       data-visible={active ? 'true' : 'false'}
       animate={{
         opacity: visibility,
-        filter: `blur(${(1 - visibility) * 16}px)`,
+        // No filter: blur() here — animating a blur on this whole layer
+        // while scrolling stutters badly on phones (fixed 18 Nov).
+        // Opacity + rise + scale are compositor-only and stay smooth.
         y: (1 - visibility) * 28,
         scale: 0.97 + 0.03 * visibility,
       }}

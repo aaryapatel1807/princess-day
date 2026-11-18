@@ -3,7 +3,7 @@ import Lenis from 'lenis'
 import { FILM_DURATION_S, FRAME_COUNT, SCENES, frameForFraction } from './data/film'
 import { SCENE_CONTENT, SCROLL_HINT } from './data/content'
 import { mapScrollToFilm } from './lib/scrollFilm'
-import { FrameLoader } from './lib/frameLoader'
+import { FrameLoader, CONCURRENCY_TOUCH } from './lib/frameLoader'
 import SceneText from './components/SceneText'
 
 /** Visibility of a scene window at a given film progress. 0..1, holds, fades out. */
@@ -74,9 +74,15 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Frame loader (recreated when quality changes).
+  // Frame loader (recreated when quality changes). Touch devices decode
+  // fewer frames at once so decoding doesn't fight the canvas draws.
   useEffect(() => {
-    const loader = new FrameLoader(`/film/${quality}`, FRAME_COUNT)
+    const coarse = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches
+    const loader = new FrameLoader(
+      `/film/${quality}`,
+      FRAME_COUNT,
+      coarse ? CONCURRENCY_TOUCH : undefined,
+    )
     loaderRef.current = loader
     loader.onFirstFrame = (ms) => {
       setFirstFrameMs(ms)
@@ -116,7 +122,12 @@ export default function App() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
-    const dpr = Math.min(window.devicePixelRatio || 1, 2)
+    const dpr = Math.min(
+      window.devicePixelRatio || 1,
+      // Phones: cap the canvas backing store at 1.5x — at 2x every draw
+      // pushes twice the pixels for no visible gain (SD frames are 720p).
+      window.innerWidth < 768 ? 1.5 : 2,
+    )
     const cw = window.innerWidth
     const ch = window.innerHeight
     if (canvas.width !== Math.round(cw * dpr) || canvas.height !== Math.round(ch * dpr)) {
@@ -133,7 +144,9 @@ export default function App() {
     lastDrawnExactRef.current = loader?.get(baseFrame) !== undefined
     const nextImg = frac > 0 && baseFrame < FRAME_COUNT ? loader?.get(baseFrame + 1) : undefined
     ctx.imageSmoothingEnabled = true
-    ctx.imageSmoothingQuality = 'high'
+    // 'high' resampling on every tick stutters on phones; 'medium' is
+    // visually identical at these scales and far cheaper.
+    ctx.imageSmoothingQuality = 'medium'
     const zoom = 1 + 0.07 * filmProgressRef.current
     const drawCover = (img: HTMLImageElement, alpha: number) => {
       const iw = img.naturalWidth || img.width
@@ -174,10 +187,12 @@ export default function App() {
       // Redraw on a frame change, on any visible progress change (the
       // blend + zoom make sub-frame progress visible), or when the exact
       // wanted frame has just finished loading after a fallback draw.
-      // (No redraw while idle — the picture is static then.)
+      // (No redraw while idle — the picture is static then.) The 0.0008
+      // threshold is ~0.03 s of film: fine enough that the blend still
+      // looks continuous, coarse enough to halve redraws on phones.
       if (
         frame !== lastDrawnFrameRef.current ||
-        Math.abs(filmProgressRef.current - lastDrawnProgressRef.current) > 0.0002 ||
+        Math.abs(filmProgressRef.current - lastDrawnProgressRef.current) > 0.0008 ||
         (!lastDrawnExactRef.current && loaderRef.current?.has(frame))
       ) {
         drawCurrent()

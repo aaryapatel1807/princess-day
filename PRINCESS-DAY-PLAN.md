@@ -107,6 +107,10 @@ SCENES (position as a fraction of the 37.6s film, then placement):
 ## Watermark removal — 18 Nov (Aarya: "watermark remove that")
 - The Flow sparkle was in clips 1 (clear) and 3 (faint) only, at a fixed spot bottom-right, centre (1740, 905). Removed by reverse-blending: temporal median isolates the overlay, alpha estimated against a TELEA-inpainted background, every frame un-blended. Rejected: ffmpeg delogo (vertical smear) and plain inpainting (grey blob). Film re-joined from the cleaned clips: 37.21 s, 558 frames (was 37.25 s / 559). Residual: a ~1–2 px faint outline visible only in zoomed crops of the corner; invisible at full-frame scale and in motion. Full method + verification in public/film/README.md §3.
 
+## Lag fix — 18 Nov (Aarya: "why it is so lagging", on his phone)
+- Cause: the chapter text animated `filter: blur()` (16px on the whole scene layer, 6px per heading letter) — re-computing a big blur every frame while scrolling stutters badly on phones. Plus the pacing fix's per-tick double canvas draw at DPR 2 with 'high' resampling.
+- Fix: blur removed from all text animation (opacity + rise + scale only, compositor-cheap); canvas smoothing 'high' → 'medium'; canvas DPR capped at 1.5 on phones; redraw threshold 0.0002 → 0.0008; frame-loader concurrency 6 → 4 on touch devices. Visuals at rest are unchanged (blur was 0 at full visibility).
+
 Keep all text in src/data/content.ts and scene timings in src/data/film.ts.
 ```
 
