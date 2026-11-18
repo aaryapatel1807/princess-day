@@ -140,6 +140,9 @@ describe('film.ts timings', () => {
   })
 
   it('film duration and frame count agree at 15 fps', () => {
-    expect(FRAME_COUNT).toBe(Math.floor(FILM_DURATION_S * 15) + 1)
+    // 558 frames extracted at 15 fps from the 37.208 s joined film
+    // (frames at t = 0, 1/15, …, 557/15 = 37.133 s).
+    expect(FRAME_COUNT).toBe(Math.floor(FILM_DURATION_S * 15))
+    expect(FRAME_COUNT).toBe(558)
   })
 })

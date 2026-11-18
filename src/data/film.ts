@@ -2,15 +2,17 @@
  * Film timing data — the single source of truth for the scroll-film.
  *
  * Joined film (see public/film/README.md): 5 clips xfade-joined at 0.6s.
- * Measured duration 37.25 s (ffprobe), 559 frames at 15 fps (f0001–f0559).
+ * Measured duration 37.21 s (ffprobe), 558 frames at 15 fps (f0001–f0558).
+ * (Was 37.25 s / 559 frames before the 18 Nov watermark removal re-join:
+ * the cleaned clips are 13 ms shorter each, so the join is 42 ms shorter.)
  * All scene timings below are FRACTIONS of the film, copied exactly from
  * PRINCESS-DAY-PLAN.md Stage 2. Do not edit the fractions without also
  * updating the plan.
  */
 
-export const FILM_DURATION_S = 37.25
+export const FILM_DURATION_S = 37.21
 export const FILM_FPS = 15
-export const FRAME_COUNT = 559
+export const FRAME_COUNT = 558
 
 /** Frame number (1-based) for a time in seconds, clamped to the film. */
 export function frameForTime(tSeconds: number): number {

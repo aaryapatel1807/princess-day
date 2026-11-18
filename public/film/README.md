@@ -21,6 +21,9 @@ ffmpeg -i clip1.mp4 -i clip2.mp4 -i clip3.mp4 -i clip4.mp4 -i clip5.mp4 \
 Offsets are dur−0.6 cumulative: 7.33, 14.646667, 21.963334, 29.293334.
 Result: `media/joined.mp4`, **37.25 s** (ffprobe), 1920×1080, 42 MB.
 Expected total = 39.623334 − 4×0.6 = 37.223334 s; the 37.25 s ffprobe value is frame rounding at 24 fps. `src/data/film.ts` uses 37.25.
+(18 Nov watermark removal re-join: cleaned clips 1 & 3 are 7.916667 s, so
+offsets became 7.316667, 14.633334, 21.95, 29.28; joined 37.208 s, 558
+frames; film.ts now 37.21 s / 558. See §3.)
 
 ## 2. Extract frames at 15 fps
 
@@ -30,25 +33,39 @@ ffmpeg -i media/joined.mp4 -vf "fps=15,scale=1280:720" -c:v libwebp -quality 78 
 ffmpeg -ss 2 -i media/joined.mp4 -vframes 1 -c:v libwebp -quality 84 public/film/poster.webp
 ```
 
-Result: **559 frames** (f0001.webp–f0559.webp) in each of `hd/` and `sd/`.
+Result: **558 frames** (f0001.webp–f0558.webp) in each of `hd/` and `sd/`.
+(Was 559 before the 18 Nov watermark-removal re-join; the join is 42 ms
+shorter now.)
 - `public/film/hd/` — 1920×1080 WebP q84 — **63 MB** (64,067,324 bytes)
 - `public/film/sd/` — 1280×720 WebP q78 — **32 MB** (32,054,192 bytes)
 - `public/film/poster.webp` — 1920×1080, frame at 2 s — 123 KB
 
 No Real-ESRGAN upscale (clips already 1080p, skipped per plan).
 
-## 3. Watermark re-check — ⚠️ FOUND, NOT REMOVED
+## 3. Watermark — REMOVED 18 Nov (on Aarya's word, reversing the deploy-as-is call)
 
-The task brief said the clips were verified clean. Re-checking disagrees:
+The Flow sparkle (semi-transparent white 4-point star, centre (1740, 905),
+spanning x 1705–1775, y 875–935) was present in clips 1 (clear, alpha ~0.3)
+and 3 (faint, alpha ~0.2) only — median-residual checks on clips 2/4/5 were
+~0, so they were left untouched.
 
-- A semi-transparent white 4-point sparkle (Google/Flow AI watermark) sits at a **fixed position, ~ (1700, 920) in 1920×1080**, bottom-right quadrant.
-- It is **clearly visible in clip 1** at 1 s, 4 s and 6 s at the identical pixel position while the scene behind it changes completely (cushion → door → wall) — a fixed overlay, not a scene sparkle. A 16-frame temporal median makes it stand out sharply.
-- **Faintly visible in clip 3** (same position, ~20 s in the joined film, over the lake).
-- Not visible in the temporal medians of clips 2, 4, 5 (busy/bright backgrounds there may hide it, or it is absent).
-- Confirmed on the **joined film**: crop at 4 s shows the star clearly; crop at 20 s shows it faintly.
-- Evidence crops: `/tmp/pd-stage1/` (`clip1_median_br.png`, `clip3_median_br.png`, `joined_br_4s.jpg`, `joined_br_20s.jpg`).
+Method (script `/tmp/clean_watermark.py`, cv2 in a venv — no cv2 on the
+system python): temporal median over every 6th frame isolates the fixed
+overlay; background = TELEA inpaint of the median with a dilated star mask;
+alpha = (median − bg) / (255 − bg), clipped [0, 0.85], zero outside the star
+box, Gaussian σ0.5, low-alpha fringe suppressed (× clip(alpha/0.15)) so the
+reverse-blend doesn't draw a dark outline. Every frame:
+recovered = (observed − alpha·255) / (1 − alpha). Re-encoded libx264 crf 16.
+Rejected first: ffmpeg delogo (left a vertical smear) and plain TELEA
+inpaint (left a grey blob). Residual: a ~1–2 px faint outline visible only
+in zoomed crops of the corner; at full-frame scale and in motion it is
+invisible, and the bright star is gone. Verified on crops at joined 4 s
+and 20 s, and on a full 1440×810 frame.
 
-No alpha-mask / TELEA removal was done, per the task brief. **Decision needed before shipping:** the opening ~7 s of the film shows this sparkle on dark wood. Either accept it, or run the removal pass from the original plan (estimate alpha mask over ~150 frames, reverse the blend, TELEA-inpaint only a thin edge ring, verify on zoomed crops).
+Re-join (cleaned clips are 7.916667 s each, 13 ms shorter): offsets
+7.316667, 14.633334, 21.95, 29.28. Result: `media/joined.mp4`, **37.208 s**,
+**558 frames** at 15 fps — `src/data/film.ts` updated to 37.21 s / 558
+frames (was 37.25 s / 559).
 
 ## 4. Known film imperfection (left as-is)
 

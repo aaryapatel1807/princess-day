@@ -60,11 +60,11 @@ test.describe('Princess Day — every scene', () => {
     await page.setViewportSize({ width: 1440, height: 810 })
     await page.goto('/')
     await page.waitForSelector('[data-testid="film-stats"]', { state: 'attached' })
-    // Wait for the full load (all 559 frames in the chosen quality).
+    // Wait for the full load (all 558 frames in the chosen quality).
     await page.waitForFunction(
       () => {
         const el = document.querySelector('[data-testid="film-stats"]')
-        return el && Number(el.getAttribute('data-loaded')) >= 559
+        return el && Number(el.getAttribute('data-loaded')) >= 558
       },
       { timeout: 180_000 },
     )
@@ -76,7 +76,7 @@ test.describe('Princess Day — every scene', () => {
       quality: el.getAttribute('data-quality'),
     }))
     console.log('[playwright] film stats:', JSON.stringify(stats))
-    expect(stats.loaded).toBe('559')
+    expect(stats.loaded).toBe('558')
     expect(stats.failed).toBe('')
     expect(Number(stats.firstFrameMs)).toBeLessThan(5000)
   })

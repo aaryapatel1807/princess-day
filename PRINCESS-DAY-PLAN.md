@@ -104,6 +104,9 @@ SCENES (position as a fraction of the 37.6s film, then placement):
 - Problem: the opening 15–20s of scrolling felt slow and not cinematic; the end felt good. Cause: dwell 3.2x over the middle 60% of every scene meant 74% of all scrolling happened inside dwell zones (film barely moved per scroll notch), 15 fps nearest-frame stepping made motion jumpy, and Lenis lerp 0.09 was too floaty.
 - Fix: dwell 1.8x over the middle 40% of each scene; scroll track 5200vh → 4000vh desktop, 4200vh → 3200vh phones; frame blending (crossfade between adjacent frames by fractional frame position) + slow Ken Burns zoom 1.00 → 1.07 across the film; Lenis lerp 0.09 → 0.12; canvas only redraws when progress/frame actually changes. Copy and scene timings unchanged.
 
+## Watermark removal — 18 Nov (Aarya: "watermark remove that")
+- The Flow sparkle was in clips 1 (clear) and 3 (faint) only, at a fixed spot bottom-right, centre (1740, 905). Removed by reverse-blending: temporal median isolates the overlay, alpha estimated against a TELEA-inpainted background, every frame un-blended. Rejected: ffmpeg delogo (vertical smear) and plain inpainting (grey blob). Film re-joined from the cleaned clips: 37.21 s, 558 frames (was 37.25 s / 559). Residual: a ~1–2 px faint outline visible only in zoomed crops of the corner; invisible at full-frame scale and in motion. Full method + verification in public/film/README.md §3.
+
 Keep all text in src/data/content.ts and scene timings in src/data/film.ts.
 ```
 
