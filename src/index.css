@@ -30,9 +30,10 @@ body {
 
 .app { position: relative; }
 
-/* Scroll track: 5200vh desktop, 4200vh phones. */
+/* Scroll track: 4000vh desktop, 3200vh phones (shortened 18 Nov — the
+   original 5200/4200vh made the opening chapters feel frozen). */
 .scroll-track {
-  height: 5200vh;
+  height: 4000vh;
   width: 1px;
 }
 
@@ -143,21 +144,6 @@ body {
   text-shadow: 0 1px 14px rgba(8, 10, 36, 0.95), 0 0 24px rgba(8, 10, 36, 0.6);
 }
 
-.finale-note {
-  position: absolute;
-  left: 50%;
-  bottom: 9%;
-  transform: translateX(-50%);
-  width: min(620px, 88vw);
-  text-align: center;
-  font-family: var(--font-ui);
-  font-size: 0.82rem;
-  line-height: 1.6;
-  color: rgba(255, 243, 207, 0.82);
-  text-shadow: 0 1px 10px rgba(8, 10, 36, 0.95);
-  transition: opacity 0.8s ease;
-}
-
 /* Only chrome: thin rose-to-gold progress line + scroll hint. */
 .progress-line {
   position: fixed;
@@ -195,15 +181,13 @@ body {
 
 /* Phones: compositions to the bottom, full width. */
 @media (max-width: 767px) {
-  .scroll-track { height: 4200vh; }
+  .scroll-track { height: 3200vh; }
   .scene { width: 100vw; left: 0 !important; right: auto !important; top: auto !important; bottom: 7% !important; translate: none; text-align: center; }
   .scene--finale { bottom: 22% !important; }
-  .finale-note { bottom: 4%; }
   .scene-pool { padding: 2.4rem 1.4rem 2rem; border-radius: 0; background: radial-gradient(ellipse at 50% 100%, rgba(8, 10, 36, 0.66) 0%, rgba(8, 10, 36, 0.3) 60%, rgba(8, 10, 36, 0) 85%); }
   .scene-heading { font-size: clamp(1.9rem, 8.4vw, 2.6rem); }
   .scene-body { font-size: 1.22rem; }
   .scene-label { font-size: 0.72rem; }
-  .finale-note { bottom: 5%; width: 92vw; font-size: 0.75rem; }
   .scroll-hint { bottom: 3%; }
 }
 

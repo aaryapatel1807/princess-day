@@ -43,16 +43,16 @@ describe('scroll-to-frame mapping', () => {
   it('advances slower inside dwell zones than between chapters (dwell remap)', () => {
     const zones = dwellZones()
     expect(zones.length).toBe(SCENES.length)
-    // Ch3-body dwell zone: film 0.503–0.545 (length 0.042). Compare with a
-    // pure-normal stretch of the same film length, 0.378–0.420 (between
+    // Ch3-body dwell zone: film 0.510–0.538 (length 0.028). Compare with a
+    // pure-normal stretch of the same film length, 0.378–0.406 (between
     // chapters, outside every dwell zone).
     const zone = zones[5]
-    expect(zone.start).toBeCloseTo(0.503, 3)
-    expect(zone.end).toBeCloseTo(0.545, 3)
+    expect(zone.start).toBeCloseTo(0.51, 3)
+    expect(zone.end).toBeCloseTo(0.538, 3)
     const zoneScroll = mapFilmToScroll(zone.end) - mapFilmToScroll(zone.start)
-    const normalScroll = mapFilmToScroll(0.42) - mapFilmToScroll(0.378)
+    const normalScroll = mapFilmToScroll(0.406) - mapFilmToScroll(0.378)
     expect(zoneScroll).toBeCloseTo(normalScroll * DWELL_FACTOR, 6)
-    expect(DWELL_FACTOR).toBe(3.2)
+    expect(DWELL_FACTOR).toBe(1.8)
   })
 
   it('dwell segments cover the whole film with no gaps', () => {

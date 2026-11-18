@@ -82,7 +82,4 @@ export const SCENE_CONTENT: SceneContent[] = [
   },
 ]
 
-export const FINALE_NOTE =
-  'Every frame was drawn by AI and stitched into a film, so your scrolling is the play button, like a flipbook you turn with your thumb. - Aarya'
-
 export const SCROLL_HINT = 'Scroll slowly'

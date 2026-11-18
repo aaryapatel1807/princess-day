@@ -1,24 +1,30 @@
 /**
  * Scroll → film mapping, including the DWELL remap.
  *
- * While any content is fully visible the film advances 3.2x slower; between
- * chapters it plays at normal speed. "Fully visible" is the middle 60% of a
+ * While any content is fully visible the film advances 1.8x slower; between
+ * chapters it plays at normal speed. "Fully visible" is the middle 40% of a
  * scene's film-fraction window. The map is built as a piecewise-linear
- * function: every film segment is given a scroll-space weight (3.2 inside a
+ * function: every film segment is given a scroll-space weight (1.8 inside a
  * dwell zone, 1 outside), the weights are normalised so raw scroll progress
  * still spans [0, 1], and the map is inverted to go scroll → film.
  * Both directions are clamped to [0, 1].
+ *
+ * Pacing fix (18 Nov, after watching the live site): the original 3.2x
+ * dwell over the middle 60% of every scene meant 74% of all scrolling
+ * happened inside dwell zones, so the opening chapters felt frozen — the
+ * film barely moved per scroll notch. 1.8x over the middle 40% keeps text
+ * readable while the film keeps moving.
  */
 
 import { SCENES } from '../data/film'
 
-export const DWELL_FACTOR = 3.2
+export const DWELL_FACTOR = 1.8
 
 export interface Segment {
   /** Film-fraction interval. */
   start: number
   end: number
-  /** 3.2 inside a dwell zone, 1 outside. */
+  /** 1.8 inside a dwell zone, 1 outside. */
   weight: number
   /** Scroll-progress interval this segment occupies. */
   scrollStart: number
@@ -30,11 +36,11 @@ export interface DwellZone {
   end: number
 }
 
-/** Middle 60% of each scene window — the part where content is fully visible. */
+/** Middle 40% of each scene window — the part where content is fully visible. */
 export function dwellZones(): DwellZone[] {
   return SCENES.map((s) => {
     const len = s.end - s.start
-    return { start: s.start + 0.2 * len, end: s.end - 0.2 * len }
+    return { start: s.start + 0.3 * len, end: s.end - 0.3 * len }
   })
 }
 

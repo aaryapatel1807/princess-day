@@ -98,7 +98,11 @@ SCENES (position as a fraction of the 37.6s film, then placement):
 - 0.410-0.479, top-left: label "Chapter III · The Lantern Lake", heading "Your best moments." Then 0.489-0.559: "Every lantern on the water holds one of your best moments." Then three lines, one per lantern glow, in order: "26 March 2025. The day we became a couple." / "9 February 2026. The day I first proposed." / "Every ordinary day in between."
 - 0.606-0.676, right: label "Chapter IV · The Crown", heading "Made to fit you." Then 0.691-0.777: "A thank-you for being exactly you."
 - 0.803-0.878, centre: label "Chapter V · The Night Sky", heading "Happy Princess Day, Sachi."
-- 0.888 to the end, stays on screen: "I'm better at building things than at speeches, so I built you a kingdom. It's been over 600 days and I'd choose you the same way I did on 26 March. Happy Princess Day, Sachi." Below it in small type: "Every frame was drawn by AI and stitched into a film, so your scrolling is the play button, like a flipbook you turn with your thumb. - Aarya"
+- 0.888 to the end, stays on screen: "I'm better at building things than at speeches, so I built you a kingdom. It's been over 600 days and I'd choose you the same way I did on 26 March. Happy Princess Day, Sachi." (The small-type "Every frame was drawn by AI…" note that used to sit below it was REMOVED 18 Nov on Aarya's word — no AI mention anywhere on the site now.)
+
+## Pacing fix — 18 Nov (after Aarya watched the live site)
+- Problem: the opening 15–20s of scrolling felt slow and not cinematic; the end felt good. Cause: dwell 3.2x over the middle 60% of every scene meant 74% of all scrolling happened inside dwell zones (film barely moved per scroll notch), 15 fps nearest-frame stepping made motion jumpy, and Lenis lerp 0.09 was too floaty.
+- Fix: dwell 1.8x over the middle 40% of each scene; scroll track 5200vh → 4000vh desktop, 4200vh → 3200vh phones; frame blending (crossfade between adjacent frames by fractional frame position) + slow Ken Burns zoom 1.00 → 1.07 across the film; Lenis lerp 0.09 → 0.12; canvas only redraws when progress/frame actually changes. Copy and scene timings unchanged.
 
 Keep all text in src/data/content.ts and scene timings in src/data/film.ts.
 ```
