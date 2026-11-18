@@ -1,0 +1,214 @@
+/* Princess Day — midnight navy, gold, rose. No boxes, no chrome but the
+   progress line and the scroll hint. Text lives on soft blurred radial
+   shadow pools, like part of the movie. */
+
+:root {
+  --navy: #080a24;
+  --gold: #f1cf86;
+  --gold-light: #fff3cf;
+  --rose: #f6b6d6;
+  --font-heading: 'Cinzel Decorative', 'Cinzel', Georgia, serif;
+  --font-label: 'Cinzel', Georgia, serif;
+  --font-body: 'Cormorant Garamond', Georgia, serif;
+  --font-ui: 'Manrope', system-ui, -apple-system, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--navy);
+  color: var(--gold-light);
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+.app { position: relative; }
+
+/* Scroll track: 5200vh desktop, 4200vh phones. */
+.scroll-track {
+  height: 5200vh;
+  width: 1px;
+}
+
+.film-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  display: block;
+  background: var(--navy);
+}
+
+.film-dim {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(8, 10, 36, 0.55) 0%, rgba(8, 10, 36, 0.15) 100%);
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.scene-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.scene {
+  position: absolute;
+  width: min(680px, 88vw);
+  will-change: opacity, filter, transform;
+}
+
+.scene--center {
+  left: 50%;
+  top: 46%;
+  /* CSS `translate` (not `transform`) so framer-motion's inline transform
+     for the drift/scale animation composes with it instead of wiping it out. */
+  translate: -50% -50%;
+  text-align: center;
+}
+
+.scene--lower-centre {
+  left: 50%;
+  bottom: 12%;
+  translate: -50% 0;
+  text-align: center;
+}
+
+.scene--top-left {
+  left: 7%;
+  top: 13%;
+  text-align: left;
+}
+
+.scene--right {
+  right: 7%;
+  top: 50%;
+  translate: 0 -50%;
+  text-align: left;
+  width: min(520px, 84vw);
+}
+
+/* Soft blurred radial shadow pool — no boxes. */
+.scene-pool {
+  background: radial-gradient(ellipse at center, rgba(8, 10, 36, 0.62) 0%, rgba(8, 10, 36, 0.28) 55%, rgba(8, 10, 36, 0) 78%);
+  padding: 3.2rem 3rem;
+  border-radius: 50%;
+}
+
+.scene-label {
+  font-family: var(--font-label);
+  font-size: 0.82rem;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--rose);
+  margin: 0 0 1.1rem;
+  text-shadow: 0 1px 12px rgba(8, 10, 36, 0.9);
+}
+
+/* Cinzel Decorative's space glyph renders (near-)zero-width in the latin
+   woff2, so word gaps are explicit margins, not text spaces. The h2 keeps
+   aria-label with the full text, so this is visual only. */
+.scene-word { display: inline-block; white-space: nowrap; margin-right: 0.3em; }
+.scene-word:last-child { margin-right: 0; }
+
+.scene-heading {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: clamp(2rem, 5vw, 3.9rem);
+  line-height: 1.08;
+  margin: 0 0 1rem;
+  color: var(--gold);
+  text-shadow: 0 0 28px rgba(241, 207, 134, 0.55), 0 2px 18px rgba(8, 10, 36, 0.9);
+}
+
+.scene-letter { display: inline-block; will-change: opacity, transform, filter; }
+
+.scene-body {
+  font-family: var(--font-body);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 2.4vw, 1.7rem);
+  line-height: 1.45;
+  color: var(--gold-light);
+  margin: 0.55rem 0;
+  text-shadow: 0 1px 14px rgba(8, 10, 36, 0.95), 0 0 24px rgba(8, 10, 36, 0.6);
+}
+
+.finale-note {
+  position: absolute;
+  left: 50%;
+  bottom: 9%;
+  transform: translateX(-50%);
+  width: min(620px, 88vw);
+  text-align: center;
+  font-family: var(--font-ui);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: rgba(255, 243, 207, 0.82);
+  text-shadow: 0 1px 10px rgba(8, 10, 36, 0.95);
+  transition: opacity 0.8s ease;
+}
+
+/* Only chrome: thin rose-to-gold progress line + scroll hint. */
+.progress-line {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--rose), var(--gold));
+  z-index: 5;
+  box-shadow: 0 0 12px rgba(246, 182, 214, 0.6);
+}
+
+.scroll-hint {
+  position: fixed;
+  left: 50%;
+  bottom: 4.5%;
+  transform: translateX(-50%);
+  z-index: 5;
+  font-family: var(--font-ui);
+  font-size: 0.78rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  text-shadow: 0 1px 10px rgba(8, 10, 36, 0.95);
+  transition: opacity 0.6s ease;
+  pointer-events: none;
+  animation: hint-bob 2.4s ease-in-out infinite;
+}
+
+.scroll-hint-arrow { color: var(--rose); }
+
+@keyframes hint-bob {
+  0%, 100% { margin-bottom: 0; }
+  50% { margin-bottom: 8px; }
+}
+
+/* Phones: compositions to the bottom, full width. */
+@media (max-width: 767px) {
+  .scroll-track { height: 4200vh; }
+  .scene { width: 100vw; left: 0 !important; right: auto !important; top: auto !important; bottom: 7% !important; translate: none; text-align: center; }
+  .scene--finale { bottom: 22% !important; }
+  .finale-note { bottom: 4%; }
+  .scene-pool { padding: 2.4rem 1.4rem 2rem; border-radius: 0; background: radial-gradient(ellipse at 50% 100%, rgba(8, 10, 36, 0.66) 0%, rgba(8, 10, 36, 0.3) 60%, rgba(8, 10, 36, 0) 85%); }
+  .scene-heading { font-size: clamp(1.9rem, 8.4vw, 2.6rem); }
+  .scene-body { font-size: 1.22rem; }
+  .scene-label { font-size: 0.72rem; }
+  .finale-note { bottom: 5%; width: 92vw; font-size: 0.75rem; }
+  .scroll-hint { bottom: 3%; }
+}
+
+/* Reduced motion: no bobbing, no smooth fades beyond opacity. */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-hint { animation: none; }
+  .scene, .scene-letter { transition-duration: 0.01ms !important; }
+}
